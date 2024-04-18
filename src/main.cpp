@@ -50,7 +50,7 @@ volatile uint32_t overflows = 0;
 const char compileTime [] = "\n\n11-channel ADC Test Compiled on " __DATE__ " " __TIME__;
 
 static ADC *adc = new ADC(); // adc object
-IntervalT`imer CollectionTimer;
+IntervalTimer CollectionTimer;
 
 
 #define ADCVREF  3.3166  // what I measured for V3.3 with my voltmeter
@@ -126,27 +126,28 @@ void ADC_ISR(void) {
   lastmicros =  micros();  // we can use this later  to check for sampling jitter
   for(int i=0; i<NUMCHANNELS; i++) {
     sptr->avals[i] = (uint16_t)analogRead(ADCPins[i]);
-    Serial.println(sptr->avals[i]);  // print the value to the Serial monitor
+    
+    // Print Values to Serial Monitor:
+    if (i != NUMCHANNELS - 1) 
+    {
+      Serial.print(sptr->avals[i]);  // print the value to the Serial monitor
+      Serial.print(",");  // print a comma after each value except the last one
+    } 
+    else 
+    {
+      Serial.println(sptr->avals[i]);  // print the last value followed by a newline
+    }
   }
   samplecount++;
   bufferindex++;
 }
 
-
-
-
-/*****************************************************************************
-   Read the Teensy RTC and return a time_t (Unix Seconds) value
-
- ******************************************************************************/
 time_t getTeensy3Time() {
   return Teensy3Clock.get();
 }
 
-//------------------------------------------------------------------------------
-//User provided date time callback function.
-//   See SdFile::dateTimeCallback() for usage.
-//
+// User provided date time callback function.
+// See SdFile::dateTimeCallback() for usage.
 void dateTime(uint16_t* date, uint16_t* time) {
   // use the year(), month() day() etc. functions from timelib
   // return date using FAT_DATE macro to format fields
