@@ -92,13 +92,6 @@ class SerialThread(threading.Thread):
                 csv_line = ",".join(values)  # join the values with commas
                 f.write(csv_line + "\n")  # write the CSV line into the file
 
-        # Add data to the graph
-        try:
-            self.dataHolder = [int(x) for x in tmp]
-        except Exception as e:
-            print("error:", e)
-            print('graph failed')
-
         print("Done recording: Saved", len(tmp), "numbers in", round(self.stopRecordTime-self.startRecordTime,2) ,
             "s, at frequency", round(len(tmp)/(self.stopRecordTime-self.startRecordTime)/1000,2), "kHz")
 

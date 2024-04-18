@@ -1,6 +1,7 @@
 import sys
 import glob
 from serialUtils import *
+import serial.tools.list_ports
 from collections import deque
 
 class CLI:
@@ -17,11 +18,11 @@ class CLI:
         self.serialThread.stop_recording()
 
 def get_port():
-    ports = glob.glob("/dev/tty.*")[::-1]
+    ports = list(serial.ports.list_ports.comports())
     for i, port in enumerate(ports):
-        print(f"{i+1}. {port}")
+        print(f"{i+1}. {port.device}")
     choice = int(input("Select a port: ")) - 1
-    return ports[choice]
+    return ports[choice].device
 
 def main():
     if len(sys.argv) != 2:
