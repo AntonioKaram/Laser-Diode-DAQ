@@ -1,6 +1,6 @@
 import sys
 import glob
-from serialUtils import *
+from modules.serialUtils import *
 import serial.tools.list_ports
 from collections import deque
 
@@ -18,7 +18,7 @@ class CLI:
         self.serialThread.stop_recording()
 
 def get_port():
-    ports = list(serial.ports.list_ports.comports())
+    ports = list(serial.tools.list_ports.comports())
     for i, port in enumerate(ports):
         print(f"{i+1}. {port.device}")
     choice = int(input("Select a port: ")) - 1

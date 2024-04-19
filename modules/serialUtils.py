@@ -4,7 +4,6 @@ import threading
 import os
 import time
 import copy
-from datetime import datetime
 
 class ReadLine:
     def __init__(self, s):
@@ -83,14 +82,20 @@ class SerialThread(threading.Thread):
         self.send_message("q")
 
         # write into file
+        tmp = copy.copy(self.data)
+        tmp = b''.join(tmp)
+        tmp = tmp.strip().split(b'\r\n')
+        tmp = [x.decode("utf-8").strip() for x in tmp]
         with open(self.recordingfilename, "w+") as f:
-            for line in self.data:
-                decoded = line.decode("utf-8")
-                if len(decoded.split(',')) >= 6:
-                    f.write(datetime.now().strftime("%H:%M:%S") + "," + decoded + "\n")
+            for line in tmp:
+                values = line.split()  # split the line into values
+                if len(values) >=6:
+                    csv_line = ",".join(values)  # join the values with commas
+                    print(csv_line)
+                    f.write(csv_line + "\n")  # write the CSV line into the file
 
-        print("Done recording: Saved", len(self.data), "numbers in", round(self.stopRecordTime-self.startRecordTime,2) ,
-            "s, at frequency", round(len(self.data)/(self.stopRecordTime-self.startRecordTime)/1000,2), "kHz")
+        print("Done recording: Saved", len(tmp), "numbers in", round(self.stopRecordTime-self.startRecordTime,2) ,
+            "s, at frequency", round(len(tmp)/(self.stopRecordTime-self.startRecordTime)/1000,2), "kHz")
 
         # Reset variables and iterate the default file num
         self.data = []
