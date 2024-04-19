@@ -2,3 +2,4 @@
 
 # Global Variables
 window, fram, anim = None, None, None
+filename = "data.csv"
