@@ -115,6 +115,14 @@ class SerialThread(threading.Thread):
         # print("Sent in thread", self.message)
         self.RTS = False
         self.message = ""
+        
+        
+    def avg(self, line):
+        values = map(int, line.split(','))
+        
+        
+        
+        
 
 
     def run(self):
@@ -134,20 +142,33 @@ class SerialThread(threading.Thread):
             if self.recording and not self.RTS:
                 while self.com.in_waiting:
                     self.data.append(self.com.read(1000))
-                    # print(self.com.in_waiting) # shows num bytes backed up in buffr
 
-                # write into file
+                # Write into file
                 tmp = copy.copy(self.data)
                 tmp = b''.join(tmp)
                 tmp = tmp.strip().split(b'\r\n')
                 tmp = [x.decode("utf-8").strip() for x in tmp]
-                with open(self.recordingfilename, "a") as f:  # use 'a' to append to the file
+                
+                
+                with open(self.recordingfilename, "a") as f:
+                    write_buff = []
                     for line in tmp:
-                        values = line.split()  # split the line into values
+                        values = line.split()
                         if len(values) == 1 and values[0][0].isdigit():
-                            csv_line = ",".join(values)  # join the values with commas
-                            f.write(datetime.now().strftime("%D:%H:%M") + ',' + csv_line + "\n")  # write the CSV line into the file
+                            csv_line = ",".join(values) 
+                            datapoint = list(map(int,csv_line.split(',')))
+                            
+                            for i, point in enumerate(datapoint):
+                                if len(write_buff) > i:
+                                    curr = (write_buff[i][0] * write_buff[i][1]) + point
+                                    write_buff[i] = (curr, write_buff[i][1] + 1)
+                                else:
+                                    write_buff.append((point, 1))
+                                
+                    if write_buff:     
+                        f.write(datetime.now().strftime("%D:%H:%M") + ',' + ','.join(write_buff) + "\n")
+                        write_buff = []
 
-                self.data = []  # clear the data after writing
+                self.data = []
 
             time.sleep(globals.sampling_rate)
