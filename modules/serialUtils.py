@@ -4,6 +4,8 @@ import threading
 import os
 import time
 import copy
+from datetime import datetime
+from modules import globals
 
 class ReadLine:
     def __init__(self, s):
@@ -81,21 +83,20 @@ class SerialThread(threading.Thread):
         # Turn off teensy recording
         self.send_message("q")
 
-        # write into file
-        tmp = copy.copy(self.data)
-        tmp = b''.join(tmp)
-        tmp = tmp.strip().split(b'\r\n')
-        tmp = [x.decode("utf-8").strip() for x in tmp]
-        with open(self.recordingfilename, "w+") as f:
-            for line in tmp:
-                values = line.split()  # split the line into values
-                if len(values) >=6:
-                    csv_line = ",".join(values)  # join the values with commas
-                    print(csv_line)
-                    f.write(csv_line + "\n")  # write the CSV line into the file
+        # # write into file
+        # tmp = copy.copy(self.data)
+        # tmp = b''.join(tmp)
+        # tmp = tmp.strip().split(b'\r\n')
+        # tmp = [x.decode("utf-8").strip() for x in tmp]
+        # with open(self.recordingfilename, "w+") as f:
+        #     for line in tmp:
+        #         values = line.split()  # split the line into values
+        #         if len(values) == 1 and values[0][0].isdigit():
+        #             csv_line = ",".join(values)  # join the values with commas
+        #             f.write(datetime.now().strftime("%D:%H:%M") + ',' + csv_line + "\n")  # write the CSV line into the file
 
-        print("Done recording: Saved", len(tmp), "numbers in", round(self.stopRecordTime-self.startRecordTime,2) ,
-            "s, at frequency", round(len(tmp)/(self.stopRecordTime-self.startRecordTime)/1000,2), "kHz")
+        # print("Done recording: Saved", len(tmp), "numbers in", round(self.stopRecordTime-self.startRecordTime,2) ,
+            # "s, at frequency", round(len(tmp)/(self.stopRecordTime-self.startRecordTime)/1000,2), "kHz")
 
         # Reset variables and iterate the default file num
         self.data = []
@@ -133,4 +134,20 @@ class SerialThread(threading.Thread):
             if self.recording and not self.RTS:
                 while self.com.in_waiting:
                     self.data.append(self.com.read(1000))
-                    # print(self.com.in_waiting) # shows num bytes backed up in buffer
+                    # print(self.com.in_waiting) # shows num bytes backed up in buffr
+
+                # write into file
+                tmp = copy.copy(self.data)
+                tmp = b''.join(tmp)
+                tmp = tmp.strip().split(b'\r\n')
+                tmp = [x.decode("utf-8").strip() for x in tmp]
+                with open(self.recordingfilename, "a") as f:  # use 'a' to append to the file
+                    for line in tmp:
+                        values = line.split()  # split the line into values
+                        if len(values) == 1 and values[0][0].isdigit():
+                            csv_line = ",".join(values)  # join the values with commas
+                            f.write(datetime.now().strftime("%D:%H:%M") + ',' + csv_line + "\n")  # write the CSV line into the file
+
+                self.data = []  # clear the data after writing
+
+            time.sleep(globals.sampling_rate)
