@@ -30,7 +30,8 @@ def animate(i, fig):
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%y:%H:%M'))
     ax.xaxis.set_major_locator(mdates.DayLocator())
 
-    ax.legend(loc='upper left')
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.1),
+          ncol=3, fancybox=True, shadow=True)
     plt.tight_layout()
 
 
