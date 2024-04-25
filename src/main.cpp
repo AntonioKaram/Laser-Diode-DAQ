@@ -8,8 +8,8 @@ const int ledpin  = 13;
 #define  LEDOFF  digitalWriteFast(ledpin,  LOW);
 
 // specify the number of channels and which pins to use
-#define NUMCHANNELS 11
-const uint16_t ADCPins[NUMCHANNELS] = {A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10};
+#define NUMCHANNELS 15
+const uint16_t ADCPins[NUMCHANNELS] = {A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14};
 
 // Specify how fast to collect samples
 #define SAMPRATE  4

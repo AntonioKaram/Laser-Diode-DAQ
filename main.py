@@ -14,7 +14,7 @@ def main():
     channels = []
     for i in range(1, 11):
         channels.append(gui.IntInput())
-        gui.TextBox(globals.frame, channels[i-1], text=f"Channel {i}", row=i, col=0)
+        gui.TextBox(globals.frame, channels[i-1], text=f"Laser {i}", row=i, col=0)
 
 
     # Create buttons for start, stop, pause

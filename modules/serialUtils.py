@@ -83,21 +83,6 @@ class SerialThread(threading.Thread):
         # Turn off teensy recording
         self.send_message("q")
 
-        # # write into file
-        # tmp = copy.copy(self.data)
-        # tmp = b''.join(tmp)
-        # tmp = tmp.strip().split(b'\r\n')
-        # tmp = [x.decode("utf-8").strip() for x in tmp]
-        # with open(self.recordingfilename, "w+") as f:
-        #     for line in tmp:
-        #         values = line.split()  # split the line into values
-        #         if len(values) == 1 and values[0][0].isdigit():
-        #             csv_line = ",".join(values)  # join the values with commas
-        #             f.write(datetime.now().strftime("%D:%H:%M") + ',' + csv_line + "\n")  # write the CSV line into the file
-
-        # print("Done recording: Saved", len(tmp), "numbers in", round(self.stopRecordTime-self.startRecordTime,2) ,
-            # "s, at frequency", round(len(tmp)/(self.stopRecordTime-self.startRecordTime)/1000,2), "kHz")
-
         # Reset variables and iterate the default file num
         self.data = []
         self.recording = False
@@ -121,10 +106,6 @@ class SerialThread(threading.Thread):
         values = map(int, line.split(','))
         
         
-        
-        
-
-
     def run(self):
         try:
             self.com = serial.Serial(self.port, self.baud, timeout = 0.5, rtscts=True)
@@ -155,18 +136,20 @@ class SerialThread(threading.Thread):
                     for line in tmp:
                         values = line.split()
                         if len(values) == 1 and values[0][0].isdigit():
-                            csv_line = ",".join(values) 
-                            datapoint = list(map(int,csv_line.split(',')))
+                            datapoint = list(map(int,values[0].split(',')))
                             
                             for i, point in enumerate(datapoint):
                                 if len(write_buff) > i:
                                     curr = (write_buff[i][0] * write_buff[i][1]) + point
-                                    write_buff[i] = (curr, write_buff[i][1] + 1)
+                                    write_buff[i] = (curr/(write_buff[i][1]+1), write_buff[i][1] + 1)
                                 else:
                                     write_buff.append((point, 1))
+
                                 
-                    if write_buff:     
-                        f.write(datetime.now().strftime("%D:%H:%M") + ',' + ','.join(write_buff) + "\n")
+                                
+                    if write_buff:
+                        output = [str(x[0]) for x in write_buff]     
+                        f.write(datetime.now().strftime("%D:%H:%M:%S") + ',' + ','.join(output) + "\n")
                         write_buff = []
 
                 self.data = []

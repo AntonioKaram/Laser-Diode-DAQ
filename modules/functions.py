@@ -32,7 +32,7 @@ def start():
     print("Connecting to Teensy...")
     port = interface.get_port()
     inter = interface.CLI(port, globals.filename)
-    time.sleep(globals.sampling_rate)
+    time.sleep(2)
     
     print("Started Data Collection...")
     inter.start_recording()

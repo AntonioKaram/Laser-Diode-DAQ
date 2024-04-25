@@ -19,10 +19,13 @@ class CLI:
 
 def get_port():
     ports = list(serial.tools.list_ports.comports())
-    for i, port in enumerate(ports):
-        print(f"{i+1}. {port.device}")
-    choice = int(input("Select a port: ")) - 1
-    return ports[choice].device
+    try:
+        return ports[1].device
+    except:
+        for i, port in enumerate(ports):
+            print(f"{i+1}. {port.device}")
+        choice = int(input("Select a port: ")) - 1
+        return ports[choice].device
 
 def main():
     if len(sys.argv) != 2:

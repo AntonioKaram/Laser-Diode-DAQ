@@ -16,23 +16,26 @@ import matplotlib.dates as mdates
 
 def animate(i, fig):
     data = pd.read_csv('data/data.csv')
-    data[data.columns[0]] = pd.to_datetime(data[data.columns[0]], format='%m/%d/%y:%H:%M')  # Convert to datetime object
+    data[data.columns[0]] = pd.to_datetime(data[data.columns[0]], format='%m/%d/%y:%H:%M:%S')  # Convert to datetime object
     x = data[data.columns[0]]
-    y1 = data[data.columns[1]]
-    y2 = data[data.columns[2]]
 
     fig.clear()
     ax = fig.subplots()
-    ax.plot(x, y1, label='Channel 1')
-    ax.plot(x, y2, label='Channel 2')
+    for i in range(1, 11):
+        if i != 2:
+            ax.plot(x, data[data.columns[i]], label=f'Laser {i}')
 
     # Format the x-axis to properly display dates
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%y:%H:%M'))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%d/%H:%M:%S'))
     ax.xaxis.set_major_locator(mdates.DayLocator())
-
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.1),
+    for label in ax.get_xticklabels():
+        label.set_rotation(45)
+        label.set_ha('right')
+        label.set_fontsize(6)
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.18),
           ncol=3, fancybox=True, shadow=True)
     plt.tight_layout()
+
 
 
     
