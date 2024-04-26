@@ -14,6 +14,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
+
 def animate(i, fig):
     data = pd.read_csv('data/data.csv')
     data[data.columns[0]] = pd.to_datetime(data[data.columns[0]], format='%m/%d/%y:%H:%M:%S')  # Convert to datetime object
@@ -21,9 +22,25 @@ def animate(i, fig):
 
     fig.clear()
     ax = fig.subplots()
+    plotted = False
+    colors = ['r', 'g', 'blue', 'gray', 'orange', 'purple', 'black', 'olivedrab', 'pink', 'sienna']
     for i in range(1, 11):
-        if i != 2:
-            ax.plot(x, data[data.columns[i]], label=f'Laser {i}')
+        if globals.channel_vars[i-1].get():
+            ax.plot(x, data[data.columns[i]], label=f'Laser {i}', color=colors[i-1])
+            ax.set_ylabel('Laser Power (Watts)')
+            plotted = True
+
+    if globals.therm_curr[1].get():
+        ax.plot(x, data[data.columns[11]], label=f'Set Mon', color='navy')
+        ax.set_ylabel('Set Monitor (Volts)')
+        plotted = True
+
+    if globals.therm_curr[0].get():
+        ax.plot(x, data[data.columns[12]], label=f'Temperature', color='teal')
+        ax.set_ylabel('Temperature (Fahrenheit)')
+        plotted = True
+
+
 
     # Format the x-axis to properly display dates
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%d/%H:%M:%S'))
@@ -32,9 +49,13 @@ def animate(i, fig):
         label.set_rotation(45)
         label.set_ha('right')
         label.set_fontsize(6)
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.18),
+
+
+    if plotted:
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.18),
           ncol=3, fancybox=True, shadow=True)
-    plt.tight_layout()
+
+        plt.tight_layout()
 
 
 

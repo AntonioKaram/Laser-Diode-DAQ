@@ -12,6 +12,10 @@ def IntInput():
 
 def Button(frame, text, row, col, command):
     ttk.Button(frame, text=text, command=command).grid(row=row, column=col)
+
+def CheckButton(frame, text, variable, row, col, command):
+    return ttk.Checkbutton(frame, text=text, variable=variable, command=command).grid(row=row, column=col)
+
     
 
 def create_window():

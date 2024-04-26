@@ -8,8 +8,8 @@ const int ledpin  = 13;
 #define  LEDOFF  digitalWriteFast(ledpin,  LOW);
 
 // specify the number of channels and which pins to use
-#define NUMCHANNELS 15
-const uint16_t ADCPins[NUMCHANNELS] = {A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14};
+#define NUMCHANNELS 13
+const uint16_t ADCPins[NUMCHANNELS] = {A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12 };
 
 // Specify how fast to collect samples
 #define SAMPRATE  4
@@ -24,8 +24,7 @@ const uint16_t ADCPins[NUMCHANNELS] = {A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A
 // multiple of 4 byte--so I added spare to make  it come
 // out to 16 bytes.
 typedef struct tSample {
-  uint32_t useconds;
-  uint16_t spare;   
+  uint32_t useconds;   
   uint16_t avals[NUMCHANNELS];
 } sampletype;  // each record is 14 bytes long for now
 
@@ -33,7 +32,7 @@ typedef struct tSample {
 // For efficiency, the number of samples in each buffer
 // is a multiple of 512, which means that complete sectors
 // are writen to the output file each time a buffer is written.
-#define SAMPLESPERBUFFER 10
+#define SAMPLESPERBUFFER 15
 tSample buffer1[SAMPLESPERBUFFER];
 tSample buffer2[SAMPLESPERBUFFER];
 
@@ -68,6 +67,22 @@ void ShowADCVolts(void) {
 }
 
 File adcFile;
+
+float temp(float therm) {
+
+  float R1 = 10000;
+  float logR2, R2, T;
+  float c1 = 1.009249522e-03, c2 = 2.378405444e-04, c3 = 2.019202697e-07;
+
+  R2 = R1 * (4096.0 / therm - 1.0);
+  logR2 = log(R2);
+
+  T = (1.0 / (c1 + c2*logR2 + c3*logR2*logR2*logR2));
+  T = T - 273.15;
+  T = (T * 9.0)/ 5.0 + 32.0;
+
+  return T;
+}
 
 void CMSI(void) {
   Serial.println();
@@ -122,7 +137,6 @@ void ADC_ISR(void) {
   sptr = (tSample *)&adcptr[bufferindex];
   // pure pointer arithmetic MIGHT be faster--depending on how well the compiler optimizes.
   sptr->useconds = now();
-  sptr->spare = uint16_t(micros() - lastmicros);
   lastmicros =  micros();  // we can use this later  to check for sampling jitter
   for(int i=0; i<NUMCHANNELS; i++) {
     sptr->avals[i] = (uint16_t)analogRead(ADCPins[i]);
@@ -130,7 +144,12 @@ void ADC_ISR(void) {
     // Print Values to Serial Monitor:
     if (i != NUMCHANNELS - 1) 
     {
-      Serial.print(sptr->avals[i]);  // print the value to the Serial monitor
+      if (i == NUMCHANNELS - 2) {
+        Serial.print(temp((float) sptr->avals[i]), 4);
+      }
+      else {
+         Serial.print((sptr->avals[i]) * ADCVREF/4096.0, 4);
+      }
       Serial.print(",");  // print a comma after each value except the last one
     } 
     else 

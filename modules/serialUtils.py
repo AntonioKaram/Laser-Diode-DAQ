@@ -136,7 +136,7 @@ class SerialThread(threading.Thread):
                     for line in tmp:
                         values = line.split()
                         if len(values) == 1 and values[0][0].isdigit():
-                            datapoint = list(map(int,values[0].split(',')))
+                            datapoint = list(map(float,values[0].split(',')))
                             
                             for i, point in enumerate(datapoint):
                                 if len(write_buff) > i:
