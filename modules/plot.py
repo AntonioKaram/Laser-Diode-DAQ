@@ -1,26 +1,25 @@
 # plot.py
 import matplotlib.pyplot as plt
 import pandas as pd
-from modules import data as dt, globals
+from modules import globals
 import matplotlib.ticker as ticker
 from matplotlib.figure import Figure 
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,  NavigationToolbar2Tk) 
 
-import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-
-import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 
 
 def animate(i, fig):
     data = pd.read_csv('data/data.csv')
     x = data[data.columns[0]]
     
-
+    if globals.power_factors and not data.empty:
+        for i, pf in enumerate(globals.power_factors):
+            
+            # new value = value * pf/most recent voltage
+            scalar = (pf/data[data.columns[i+1]].tail(1).values[0])
+            data.iloc[:, i] = data.iloc[:, i].astype('float64') * (0.0 if float(scalar) == 0 else float(scalar))
+            
     fig.clear()
     ax = fig.subplots()
     plotted = False

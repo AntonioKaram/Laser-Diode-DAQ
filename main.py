@@ -1,5 +1,6 @@
 import sys
-from modules import data, plot, gui, globals, functions 
+import numpy as np
+from modules import gui, globals, functions 
 
 
 def main():
@@ -9,8 +10,13 @@ def main():
     sampling_period = gui.IntInput()
     gui.TextBox(globals.frame, sampling_period, text= "Sample Period (s)", row=0, col=0)
     
-
-
+    loaded_factors = np.loadtxt('data/array.txt')
+    
+    
+    if len(loaded_factors):
+        for pf in loaded_factors:
+            globals.power_factors.append(pf) 
+            
     # Create an input box for test criteria
     channels = []
     for i in range(1, 11):
@@ -34,12 +40,12 @@ def main():
     gui.CheckButton(globals.frame, text = f'Show Current', variable=curr_var, row = 1, col = 5, command=functions.curr_check)
 
 
-    gui.Button(globals.frame, "Save", 0, 2, command=lambda: functions.save(sampling_period, channels))
+    gui.Button(globals.frame, "Save", 0, 2, command=lambda: functions.save(sampling_period))
 
     # Create buttons for start, stop, pause
     gui.Button(globals.frame, "Start", 1, 2, command=functions.start)
     gui.Button(globals.frame, "Stop", 2, 2, command=functions.stop)
-    gui.Button(globals.frame, "Export", 3, 2, command=functions.export)
+    gui.Button(globals.frame, "Rescale", 3, 2, command= lambda: functions.rescale(channels))
     gui.Button(globals.frame, "Quit", 4, 2, command=functions.quit)
     
     # Run GUI

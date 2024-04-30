@@ -1,6 +1,7 @@
 # functions.py
 import sys
 import time
+import numpy as np
 from modules import globals, plot, interface
 
 port = None
@@ -19,19 +20,24 @@ def quit():
     print("Exitting...") 
     sys.exit(0)
 
-def save(val, powers):
+def save(val):
     globals.sampling_rate = val.get()
     print(f"Saved {globals.sampling_rate}")
+
+    time.sleep(1)
     
+def rescale(powers):
+        
     if not globals.power_factors:
         for p in powers:
             globals.power_factors.append(p.get())
 
     else:
         for i, p in enumerate(powers):
-            globals.power_factors[i] = p.get()
-
-    time.sleep(1)
+            if p.get() != 0:
+                globals.power_factors[i] = p.get()
+    
+    np.savetxt('./data/array.txt', globals.power_factors)
 
 def stop_animation():
     globals.anim.event_source.stop()
@@ -68,9 +74,6 @@ def stop():
     inter.serialThread.stop()
     stop_animation()
 
-    
-def export():
-    print("Exported")
 
 def gettemp(therm):
     R1 = 10000
