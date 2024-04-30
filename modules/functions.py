@@ -35,6 +35,14 @@ def save(val, powers):
 
 def stop_animation():
     globals.anim.event_source.stop()
+    
+    print("Stopping")
+    if inter:
+        inter.stop_recording()
+        inter.serialThread.stop()
+        time.sleep(1)
+        
+    print("Stopped")
 
 def start():
     global port, inter
@@ -48,7 +56,10 @@ def start():
     time.sleep(globals.sampling_rate)
 
     print("Launching Plot...")
-    plot.plot(globals.window)
+    if globals.anim:
+        globals.anim.event_source.start()
+    else:
+        plot.plot(globals.window)
 
 def stop():
     global inter
