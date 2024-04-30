@@ -7,3 +7,4 @@ sampling_rate = 1
 channel_vars = []
 therm_curr = []
 power_factors = []
+total_time = 0

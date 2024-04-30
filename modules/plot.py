@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 from modules import data as dt, globals
+import matplotlib.ticker as ticker
 from matplotlib.figure import Figure 
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,  NavigationToolbar2Tk) 
@@ -17,8 +18,8 @@ import matplotlib.dates as mdates
 
 def animate(i, fig):
     data = pd.read_csv('data/data.csv')
-    data[data.columns[0]] = pd.to_datetime(data[data.columns[0]], format='%m/%d/%y:%H:%M:%S')  # Convert to datetime object
     x = data[data.columns[0]]
+    
 
     fig.clear()
     ax = fig.subplots()
@@ -39,16 +40,10 @@ def animate(i, fig):
         ax.plot(x, data[data.columns[12]], label=f'Temperature', color='teal')
         ax.set_ylabel('Temperature (Fahrenheit)')
         plotted = True
-
-
-
+        
     # Format the x-axis to properly display dates
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%d/%H:%M:%S'))
-    ax.xaxis.set_major_locator(mdates.DayLocator())
-    for label in ax.get_xticklabels():
-        label.set_rotation(45)
-        label.set_ha('right')
-        label.set_fontsize(6)
+    ax.set_xlabel('Time (hours)')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(int(len(x)/8) if int(len(x)/8) > 0 else 1 ))
 
 
     if plotted:

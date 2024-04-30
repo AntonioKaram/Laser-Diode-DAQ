@@ -130,7 +130,6 @@ class SerialThread(threading.Thread):
                 tmp = tmp.strip().split(b'\r\n')
                 tmp = [x.decode("utf-8").strip() for x in tmp]
                 
-                
                 with open(self.recordingfilename, "a") as f:
                     write_buff = []
                     for line in tmp:
@@ -146,11 +145,11 @@ class SerialThread(threading.Thread):
                                     write_buff.append((point, 1))
 
                                 
-                                
                     if write_buff:
                         output = [str(x[0]) for x in write_buff]     
-                        f.write(datetime.now().strftime("%D:%H:%M:%S") + ',' + ','.join(output) + "\n")
+                        f.write(str(globals.total_time)/3600 + ',' + ','.join(output) + "\n")
                         write_buff = []
+                        globals.total_time += globals.sampling_rate
 
                 self.data = []
 
